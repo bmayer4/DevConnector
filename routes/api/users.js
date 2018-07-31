@@ -64,8 +64,11 @@ router.post('/login', (req, res) => {
     const password = req.body.password;
 
     User.findOne({email}).then((user) => {
-        errors.email = 'User not found';
-        if (!user) { res.status(404).json(erros); }
+     
+        if (!user) { 
+            errors.email = 'User not found';
+            res.status(404).json(errors);
+         }
 
         user.comparePassword(password).then((user) => {
             user.generateToken().then((token) => {
@@ -77,7 +80,7 @@ router.post('/login', (req, res) => {
                 }
             }).catch(err => { res.json(err) });
             }).catch((e) => {
-                errors.email = 'Password incorrect';
+                errors.password = 'Password incorrect';
                 res.status(401).json(errors); 
              });
         }).catch(err => res.json(err));

@@ -42,6 +42,7 @@ UserSchema.methods.generateToken = function() {
     const payload = { id: user.id, email: user.email, avatar: user.avatar };
 
     let token = jwt.sign(payload, keys.secret, { expiresIn: "12h"  });
+    
     return Promise.resolve(token);
 }
 

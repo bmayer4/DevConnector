@@ -19,7 +19,7 @@ module.exports = function validateRegisterInput(data) {
     }
 
     if (!Validator.isEmail(data.email)) {
-        errors.email = 'IEmail is invalid';
+        errors.email = 'Email is invalid';
     }
 
     if (Validator.isEmpty(data.email)) {
