@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();  
 const mongoose = require('mongoose');
 const passport = require('passport');
+const prependHttp = require('prepend-http');
 
 const Profile = require('../../models/Profile');
 const User = require('../../models/User');
@@ -9,13 +10,6 @@ const validateProfileInput = require('../../validation/profile');
 const validateExperienceInput = require('../../validation/experience');
 const validateEducationInput = require('../../validation/education');
 
-
-// @route   GET api/profile/test
-// @desc    Tests profile route (id is in token)
-// @access  Public
-router.get('/test', (req, res) => {
-    res.json({ message: 'Profile works!' });
-})
 
 // @route   GET api/profile/
 // @desc    Get current users profile
@@ -42,7 +36,7 @@ router.get('/user/:user_id', (req, res) => {
             return res.status(404).json(errors);
         }
         res.json(profile);
-    }).catch(err => res.status(400).json({ profile: 'There is no profile for this user' }));
+    }).catch(err => res.status(400).json(err));
 });
 
 // @route   GET api/profile/handle/:handle
@@ -89,9 +83,9 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
     profileFields.user = req.user.id;
     if (req.body.handle) { profileFields.handle = req.body.handle };  
     if (req.body.company) { profileFields.company = req.body.company };
-    if (req.body.website) { profileFields.website = req.body.website };
+    if (req.body.website) { profileFields.website = prependHttp(req.body.website, { https: true })};
     if (req.body.location) { profileFields.location = req.body.location };
-    if (req.body.bio) { profileFields.bio = req.body.bio };  //highlight, command d twice :)
+    if (req.body.bio) { profileFields.bio = req.body.bio };  //bug, can't remove now..(solution? remove if statements)
     if (req.body.status) { profileFields.status = req.body.status };
     if (req.body.githubusername) { profileFields.githubusername = req.body.githubusername };
 
@@ -101,16 +95,18 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
     }
 
     //social
-    profileFields.social = {};
-    if (req.body.youtube) { profileFields.social.youtube = req.body.youtube };
-    if (req.body.twitter) { profileFields.social.twitter = req.body.twitter };
-    if (req.body.facebook) { profileFields.social.facebook = req.body.facebook };
-    if (req.body.linkedin) { profileFields.social.linkedin = req.body.linkedin };
-    if (req.body.instagram) { profileFields.social.instagram = req.body.instagram };
+    profileFields.social = {};  //DRY
+    if (req.body.youtube) { profileFields.social.youtube = prependHttp(req.body.youtube, { https: true })};
+    if (req.body.twitter) { profileFields.social.twitter = prependHttp(req.body.twitter, { https: true })};
+    if (req.body.facebook) { profileFields.social.facebook = prependHttp(req.body.facebook, { https: true })};
+    if (req.body.linkedin) { profileFields.social.linkedin = prependHttp(req.body.linkedin, { https: true })};
+    if (req.body.instagram) { profileFields.social.instagram = prependHttp(req.body.instagram, { https: true })};
+
 
     Profile.findOne({ user: req.user.id}).then(profile => {
         if (profile) {
             //update
+
             Profile.findOneAndUpdate({ user: req.user.id }, { $set: profileFields }, { new: true }).then(profile => {
                 res.json(profile);
             });
@@ -154,7 +150,8 @@ router.post('/experience', passport.authenticate('jwt', { session: false }), (re
         }
 
         profile.experience.unshift(newExp);
-        profile.save().then(profile => res.json(profile)).catch(err => res.status(404).json({ experience: 'Error adding experience' }));
+        errors.experience = 'Error adding experience';
+        profile.save().then(profile => res.json(profile)).catch(err => res.status(404).json(errors));
     })
 });
 
@@ -162,6 +159,7 @@ router.post('/experience', passport.authenticate('jwt', { session: false }), (re
 // @desc    Add education to profile
 // @access  Private
 router.post('/education', passport.authenticate('jwt', { session: false }), (req, res) => {
+ 
     const { errors, isValid } = validateEducationInput(req.body);
 
     if (!isValid) {
@@ -180,7 +178,8 @@ router.post('/education', passport.authenticate('jwt', { session: false }), (req
         }
 
         profile.education.unshift(newEdu);
-        profile.save().then(profile => res.json(profile)).catch(err => res.status(404).json({ education: 'Error adding education' }));
+        errors.education = 'Error adding education';
+        profile.save().then(profile => res.json(profile)).catch(err => res.status(404).json(errors));
     })
 });
 
@@ -195,7 +194,7 @@ router.delete('/experience/:exp_id', passport.authenticate('jwt', { session: fal
     return experience.id != req.params.exp_id 
     });   
     profile.experience = updatedExperience;
-        profile.save().then(profile => res.json(profile))
+        profile.save().then(profile => res.json(profile));
     }).catch(err => res.status(404).json(err));
 });
 
@@ -211,7 +210,7 @@ router.delete('/education/:edu_id', passport.authenticate('jwt', { session: fals
         return education.id != req.params.edu_id
         });   
         profile.education = updatedEducation;
-            profile.save().then(profile => res.json(profile))
+            profile.save().then(profile => res.json(profile));
         }).catch(err => res.status(404).json(err));
 });
 
@@ -221,7 +220,7 @@ router.delete('/education/:edu_id', passport.authenticate('jwt', { session: fals
 router.delete('/', passport.authenticate('jwt', { session: false }), (req, res) => {
     Profile.findOneAndRemove({ user: req.user.id }).then(() => {
         User.findOneAndRemove({ _id: req.user.id }).then(() => {
-            res.json({ succes: 'true'});
+            res.json({ success: 'true'});
         });
     });
 });

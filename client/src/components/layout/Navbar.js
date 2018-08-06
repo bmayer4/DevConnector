@@ -3,12 +3,14 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { logoutUser } from '../../actions/authActions';
+import { clearCurrentProfile } from '../../actions/profileActions';
 
 class Navbar extends Component {
 
   onLogout = (e) => {
     e.preventDefault();
     this.props.logoutUser();
+    //this.props.clearCurrentProfile();     //teacher had this, fixes bug where users public page would spin when logout
   }
 
   render() {
@@ -17,6 +19,9 @@ class Navbar extends Component {
 
     const authLinks = (
       <ul className="navbar-nav ml-auto">
+      <li className="nav-item">
+      <Link className="nav-link" to='/register'>Dashboard</Link>
+      </li>
       <li className="nav-item">
         <a href="#" onClick={this.onLogout} className="nav-link"><img src={user.avatar} alt={user.name}
         className="rounded-circle"
@@ -71,7 +76,8 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  logoutUser: () => dispatch(logoutUser())
+  logoutUser: () => dispatch(logoutUser()),
+  clearCurrentProfile: () => dispatch(clearCurrentProfile())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Navbar);

@@ -1,47 +1,47 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 
-const TextFieldGroup = ({
+const InputGroup = ({
     name, 
     placeholder,
     value,
-    label,
-    error,
-    info,
+    icon,
     type,
-    onChange,
-    disabled
+    error,
+    onChange
 }) => {
   return (
-    <div className="form-group">
-      <input 
-        type={type} 
+    <div className="input-group mb-3">
+    <div className="input-group-prepend">
+    <div className="input-group-text">
+    <i className={icon} />
+    </div>
+    </div>
+      <input
         placeholder={placeholder}
         name={name} 
         className={`form-control form-control-lg ${error && 'is-invalid'}`} 
         value={value} 
         onChange={onChange}
-        disabled={disabled}
         />
-        {info && <small className="form-text text-muted">{info}</small>}
         {error && <div className="invalid-feedback">{error}</div>}
     </div>
   )
 }
 
-TextFieldGroup.propTypes = {
+InputGroup.propTypes = {
     name: PropTypes.string.isRequired,
     placeholder: PropTypes.string,
-    value: PropTypes.string,
-    info: PropTypes.string,
+    value: PropTypes.string.isRequired,
+    icon: PropTypes.string,
     error: PropTypes.string,
     type: PropTypes.string.isRequired,
-    onChange: PropTypes.func.isRequired,
-    disabled: PropTypes.string
+    onChange: PropTypes.func.isRequired
 }
 
-TextFieldGroup.defaultProps = {
+InputGroup.defaultProps = {
     type: 'text'
 }
 
-export default TextFieldGroup;
+
+export default InputGroup;

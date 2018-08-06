@@ -8,20 +8,20 @@ import store from './store';
 import setAuthToken from './utils/setAuthToken';
 import jwt_decode from 'jwt-decode';
 import { setCurrentUser, logoutUser } from './actions/authActions';
+import { clearCurrentProfile } from './actions/profileActions';
 
 const token = localStorage.jwtToken;
 if (token) {
   setAuthToken(token);
   const decoded = jwt_decode(token);
-  console.log(decoded);
   console.log('this is decoded', decoded);
   store.dispatch(setCurrentUser(decoded));
 
-  //check for epired token
+  //check for expired token
   const currentTime = (Date.now() / 1000);
   if (decoded.exp < currentTime) {
     store.dispatch(logoutUser());
-    //TODO: clear profile
+    store.dispatch(clearCurrentProfile());
     window.location.href = '/login';
   }
 }

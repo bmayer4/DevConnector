@@ -39,7 +39,7 @@ UserSchema.methods.comparePassword = function(password) {
 
 UserSchema.methods.generateToken = function() {
     let user = this;
-    const payload = { id: user.id, email: user.email, avatar: user.avatar };
+    const payload = { id: user.id, name: user.name, email: user.email, avatar: user.avatar };
 
     let token = jwt.sign(payload, keys.secret, { expiresIn: "12h"  });
     
