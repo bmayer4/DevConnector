@@ -5,12 +5,6 @@ const passport = require('passport');
 const Post = require('../../models/Post');
 const validatePostInput = require('../../validation/post');
 
-// @route   GET api/posts/test
-// @desc    Tests posts route
-// @access  Public
-router.get('/test', (req, res) => {
-    res.json({ message: 'Posts works!' });
-});
 
 // @route   GET api/posts/
 // @desc    Get all posts
@@ -35,7 +29,7 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
     const { errors, isValid} = validatePostInput(req.body);
 
     if (!isValid) { 
-        res.status(400).json(errors) 
+        return res.status(400).json(errors) 
     }
 
     const { text, avatar, name } = req.body;
@@ -65,7 +59,7 @@ router.patch('/:id', passport.authenticate('jwt', { session: false }), (req, res
     const { errors, isValid} = validatePostInput(req.body);
 
     if (!isValid) { 
-        res.status(400).json(errors) 
+        return res.status(400).json(errors) 
     }
     Post.findOneAndUpdate({ user: req.user.id, _id: req.params.id}, { $set: { text: req.body.text }}, {new: true}).then((post) => { 
         res.json(post) 
@@ -81,7 +75,7 @@ router.post('/like/:id', passport.authenticate('jwt', { session: false }), (req,
             const updatedLikes = post.likes.filter(like => like.user != req.user.id);
             if (updatedLikes.length === post.likes.length) {
                    //was never liked, so like
-                   post.likes.unshift( {user: req.user.id });
+                   post.likes.unshift({ user: req.user.id });
                    post.save().then(post => res.json(post))
                    .catch(err => res.status(400).json({ like: 'Unable to like post' }));
                    return;
@@ -100,7 +94,7 @@ router.post('/comment/:id', passport.authenticate('jwt', { session: false }), (r
     const { errors, isValid} = validatePostInput(req.body);
 
     if (!isValid) { 
-        res.status(400).json(errors) 
+        return res.status(400).json(errors) 
     }
 
     Post.findById(req.params.id).then(post => {
@@ -117,7 +111,7 @@ router.post('/comment/:id', passport.authenticate('jwt', { session: false }), (r
 });
 
 // @route   DELETE api/posts/comment/:id/:comment_id
-// @desc    Add comment to post
+// @desc    Delete comment from post
 // @access  Private
 router.delete('/comment/:id/:comment_id', passport.authenticate('jwt', { session: false }), (req, res) => {
 

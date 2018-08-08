@@ -21,8 +21,8 @@ export const startGetProfileByHandle = (handle) => dispatch => {
 }
 
 export const createProfile = (profileData, history) => dispatch => {
-    axios.post('/api/profile', profileData).then(res => {
-        dispatch(clearErrors());
+    dispatch(clearErrors());
+    axios.post('/api/profile', profileData).then(res => {  
         history.push('/dashboard');
     }).catch(err => {
         dispatch(getErrors(err.response.data)); 
@@ -30,8 +30,8 @@ export const createProfile = (profileData, history) => dispatch => {
 }
 
 export const addExperience = (expData, history) => dispatch => {
+    dispatch(clearErrors());
     axios.post('/api/profile/experience', expData).then(res => {
-        dispatch(clearErrors());
         history.push('/dashboard');
     }).catch(err => {
         dispatch(getErrors(err.response.data)); 

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import axios from 'axios';
 import { clearCurrentProfile } from '../../actions/profileActions';
 
 
@@ -19,21 +18,27 @@ class ProfileGithub extends Component {
     const { username } = this.props;
     const { count, sort, clientId, clientSecret } = this.state;
 
-    axios.get(`https://api.github.com/users/${username}/repos?per_page=${count}&sort=${sort}&client_id=${clientId}
-    &client_secret=${clientSecret}`).then(res => {
-
-      if (this.refs.myRef) {  
-        this.setState({
-          repos: res.data
-        })
-      }
-
-    }).catch(err => console.log(err));
-
-}
+    // axios.get(`https://api.github.com/users/${username}/repos?per_page=${count}&sort=${sort}&client_id=${clientId}
+    // &client_secret=${clientSecret}`).then(res => {
+    //   if (this.refs.myRef) {  
+    //     this.setState({
+    //       repos: res.data
+    //     })
+    //   }
+    // }).catch(err => console.log(err));  axios didn't work...
+    fetch(
+      `https://api.github.com/users/${username}/repos?per_page=${count}&sort=${sort}&client_id=${clientId}&client_secret=${clientSecret}`
+    )
+      .then(res => res.json())
+      .then(data => {
+        if (this.refs.myRef && !data.message) {
+          this.setState({ repos: data });
+        }
+      })
+      .catch(err => console.log(err));
+  }
 
 componentWillUnmount() {
-  console.log('unmounted');
   this.props.clearCurrentProfile();
 }
 
@@ -75,7 +80,8 @@ componentWillUnmount() {
 }
 
 ProfileGithub.propTypes = {
-  username: PropTypes.string.isRequired
+  username: PropTypes.string.isRequired,
+  clearCurrentProfile: PropTypes.func.isRequired
 }
 
 const mapDispatchToProps = (dispatch)  => ({
