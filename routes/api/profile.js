@@ -102,7 +102,7 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
     }
 
     //social
-    profileFields.social = {};  //DRY
+    profileFields.social = {};  //if statements work below w deleting empty fields because object is initialized here
     if (req.body.youtube) { profileFields.social.youtube = prependHttp(req.body.youtube, { https: true })};
     if (req.body.twitter) { profileFields.social.twitter = prependHttp(req.body.twitter, { https: true })};
     if (req.body.facebook) { profileFields.social.facebook = prependHttp(req.body.facebook, { https: true })};
