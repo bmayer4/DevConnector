@@ -81,13 +81,20 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
 
     const profileFields = {};
     profileFields.user = req.user.id;
-    if (req.body.handle) { profileFields.handle = req.body.handle };  
-    if (req.body.company) { profileFields.company = req.body.company };
-    if (req.body.website) { profileFields.website = prependHttp(req.body.website, { https: true })};
-    if (req.body.location) { profileFields.location = req.body.location };
-    if (req.body.bio) { profileFields.bio = req.body.bio };  //bug, can't remove now..(solution? remove if statements)
-    if (req.body.status) { profileFields.status = req.body.status };
-    if (req.body.githubusername) { profileFields.githubusername = req.body.githubusername };
+    // if (req.body.handle) { profileFields.handle = req.body.handle };  
+    // if (req.body.company) { profileFields.company = req.body.company };
+    // if (req.body.website) { profileFields.website = prependHttp(req.body.website, { https: true })};
+    // if (req.body.location) { profileFields.location = req.body.location };
+    // if (req.body.bio) { profileFields.bio = req.body.bio };  //bug, can't remove now..(solution? remove if statements)
+    // if (req.body.status) { profileFields.status = req.body.status };
+    // if (req.body.githubusername) { profileFields.githubusername = req.body.githubusername };
+    profileFields.handle = req.body.handle;  
+    profileFields.company = req.body.company;
+    if (req.body.website) { profileFields.website = prependHttp(req.body.website, { https: true })} else { profileFields.website = '' };  //so no https:// loaded  and important it isnt null in database (in front end, will override defualt '' and go to null causing error)
+    profileFields.location = req.body.location;
+    profileFields.bio = req.body.bio ; 
+    profileFields.status = req.body.status;
+    profileFields.githubusername = req.body.githubusername;
 
     //skills, split into array
     if (typeof req.body.skills !== 'undefined') {  //let a = ''; typeof a is 'string';  let g; typeof g is 'undefined'
@@ -139,6 +146,9 @@ router.post('/experience', passport.authenticate('jwt', { session: false }), (re
     }
 
     Profile.findOne({ user: req.user.id }).then(profile => {
+        if (!profile) {
+            return res.status(404).json({ profilenotfound: 'No profile found' });
+        }
         const newExp = {
             title: req.body.title,
             company: req.body.company,
@@ -167,6 +177,9 @@ router.post('/education', passport.authenticate('jwt', { session: false }), (req
     }
 
     Profile.findOne({ user: req.user.id }).then(profile => {
+        if (!profile) {
+            return res.status(404).json({ profilenotfound: 'No profile found' });
+        }
         const newEdu = {
             school: req.body.school,
             degree: req.body.degree,
@@ -189,6 +202,9 @@ router.post('/education', passport.authenticate('jwt', { session: false }), (req
 router.delete('/experience/:exp_id', passport.authenticate('jwt', { session: false }), (req, res) => {
 
     Profile.findOne({ user: req.user.id }).then(profile => {
+        if (!profile) {
+            return res.status(404).json({ profilenotfound: 'No profile found' });
+        }
    
     const updatedExperience = profile.experience.filter((experience) => {
     return experience.id != req.params.exp_id 
@@ -205,6 +221,9 @@ router.delete('/experience/:exp_id', passport.authenticate('jwt', { session: fal
 router.delete('/education/:edu_id', passport.authenticate('jwt', { session: false }), (req, res) => {
 
     Profile.findOne({ user: req.user.id }).then(profile => {
+        if (!profile) {
+            return res.status(404).json({ profilenotfound: 'No profile found' });
+        }
    
         const updatedEducation = profile.education.filter((education) => {
         return education.id != req.params.edu_id

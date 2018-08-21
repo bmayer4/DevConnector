@@ -26,9 +26,10 @@ class App extends Component {
       <BrowserRouter>
       <div className="App">
       <Navbar />
+
       <Route exact path="/" component={Landing}/>
       <div className="container">
-      <Switch>  
+      <Switch> 
       <Route path="/register" component={Register}/>
       <Route path="/login" component={Login}/>
       <Route path="/profiles" component={Profiles}/>
@@ -40,9 +41,10 @@ class App extends Component {
       <PrivateRoute path="/add-education" component={AddEducation}/>
       <PrivateRoute path="/feed" component={Posts}/>
       <PrivateRoute path="/post/:id" component={Post}/>
-      <Route component={NotFound}/>
-      </Switch>  
+      <Route path="not-found" component={NotFound}/> 
+      </Switch> 
       </div>
+  
       <Footer />
       </div>
       </BrowserRouter>

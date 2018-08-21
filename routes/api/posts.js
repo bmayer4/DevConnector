@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();  
-const mongoose = require('mongoose');
 const passport = require('passport');
 const Post = require('../../models/Post');
 const validatePostInput = require('../../validation/post');
@@ -18,8 +17,13 @@ router.get('/', (req, res) => {
 // @desc    Get post by id
 // @access  Public
 router.get('/:id', (req, res) => {
-    Post.findById(req.params.id).then(post => res.json(post))
-    .catch(err => res.status(404).json({ nopostfound: 'No post found' }));
+    Post.findById(req.params.id).then(post => {
+        if (!post) {
+            return res.status(404).json({ postnotfound: 'No post found' });
+        }
+        res.json(post);
+    })
+    .catch(err => res.status(404).json({ nopostfound: 'Unable to retrieve post' }));
 });
 
 // @route   POST api/posts/
@@ -47,7 +51,10 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
 // @desc    Delete post by id
 // @access  Private
 router.delete('/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
-    Post.findOneAndRemove({ user: req.user.id, _id: req.params.id}).then((post) => {
+    Post.findOneAndRemove({ user: req.user.id, _id: req.params.id}).then(post => {
+        if (!post) {
+            return res.status(404).json({ postnotfound: 'No post found' });
+        }
         res.json(post);
     }).catch(err => res.status(404).json({ deletepost: 'Unable to delete post' }));
 });
@@ -59,9 +66,12 @@ router.patch('/:id', passport.authenticate('jwt', { session: false }), (req, res
     const { errors, isValid} = validatePostInput(req.body);
 
     if (!isValid) { 
-        return res.status(400).json(errors) 
+        return res.status(400).json(errors);
     }
     Post.findOneAndUpdate({ user: req.user.id, _id: req.params.id}, { $set: { text: req.body.text }}, {new: true}).then((post) => { 
+        if (!post) {
+            return res.status(404).json({ postnotfound: 'No post found' });
+        }
         res.json(post) 
     }).catch(err => res.status(404).json({ updatepost: 'Unable to update post' }));
 });
@@ -72,6 +82,9 @@ router.patch('/:id', passport.authenticate('jwt', { session: false }), (req, res
 router.post('/like/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
 
     Post.findById(req.params.id).then(post => {
+        if (!post) {
+            return res.status(404).json({ postnotfound: 'No post found' });
+        }
             const updatedLikes = post.likes.filter(like => like.user != req.user.id);
             if (updatedLikes.length === post.likes.length) {
                    //was never liked, so like
@@ -84,7 +97,7 @@ router.post('/like/:id', passport.authenticate('jwt', { session: false }), (req,
             post.likes = updatedLikes;
             post.save().then(post => res.json(post))
             .catch(err => res.status(400).json({ like: 'Unable to unlike post' }));
-    });
+    }).catch(err => res.status(404).json({ postnotfound: 'Unable to retrieve post' }));
 });
 
 // @route   POST api/posts/comment/:id
@@ -98,6 +111,10 @@ router.post('/comment/:id', passport.authenticate('jwt', { session: false }), (r
     }
 
     Post.findById(req.params.id).then(post => {
+        if (!post) {
+            return res.status(404).json({ postnotfound: 'No post found' });
+        }
+
         const newcomment = {
             text: req.body.text,
             name: req.body.name,
@@ -107,7 +124,7 @@ router.post('/comment/:id', passport.authenticate('jwt', { session: false }), (r
 
         post.comments.unshift(newcomment);
         post.save().then(post => res.json(post));
-    }).catch(err => res.status(404).json({ postnotfound: 'No post found' }));
+    }).catch(err => res.status(404).json({ postnotfound: 'Error retreiving post' }));
 });
 
 // @route   DELETE api/posts/comment/:id/:comment_id
@@ -116,6 +133,10 @@ router.post('/comment/:id', passport.authenticate('jwt', { session: false }), (r
 router.delete('/comment/:id/:comment_id', passport.authenticate('jwt', { session: false }), (req, res) => {
 
     Post.findById(req.params.id).then(post => {
+        if (!post) {
+            return res.status(404).json({ postnotfound: 'No post found' });
+        }
+
         let comment = post.comments.filter(comment => comment.id == req.params.comment_id);
 
         if (comment.length < 1 ) {
@@ -130,7 +151,7 @@ router.delete('/comment/:id/:comment_id', passport.authenticate('jwt', { session
         post.comments.splice(commentIndex, 1);
         post.save().then(post => res.json(post));
         
-    }).catch(err => res.status(404).json({ postnotfound: 'No post found' }));
+    }).catch(err => res.status(404).json({ postnotfound: 'Error retreiving post' }));
 });
 
 module.exports = router; 

@@ -14,12 +14,11 @@ const token = localStorage.jwtToken;
 if (token) {
   setAuthToken(token);
   const decoded = jwt_decode(token);
-  console.log('this is decoded', decoded);
   store.dispatch(setCurrentUser(decoded));
 
   //check for expired token
-  const currentTime = (Date.now() / 1000);
-  if (decoded.exp < currentTime) {
+  const currentTime = (Date.now() / 1000);  
+  if (decoded.exp < currentTime) {   //decoded exp is current time when it expires / 1000
     store.dispatch(logoutUser());
     store.dispatch(clearCurrentProfile());
     window.location.href = '/login';

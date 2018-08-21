@@ -43,9 +43,10 @@ class EditProfile extends Component {
     if (nextProps.profile.profile) {  //{} is true, but not null
 
     const profile = nextProps.profile.profile;
+    console.log(nextProps.profile.profile);
     const { 
         company = '', 
-        website = '', //so doesn't get sent to server undefined, seems to work even if undefined tho
+        website = '', 
         location = '',
         githubusername = '',
         bio = '',
