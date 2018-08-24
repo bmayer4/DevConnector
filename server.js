@@ -18,7 +18,7 @@ app.use(bodyParser.json());
 
 //DB config
 mongoose.Promise = global.Promise;
-mongoose.connect(keys.mongoURI).then(() => console.log('MongoDB connected')).catch(err => console.log(err));;
+mongoose.connect(keys.mongoURI, { useNewUrlParser: true }).then(() => console.log('MongoDB connected')).catch(err => console.log(err));;
 
 //Passport middleware
 app.use(passport.initialize());
@@ -44,3 +44,8 @@ if (process.env.NODE_ENV === 'production') {
 app.listen(port, () => {
   console.log(`server running on port ${port}`);
 });
+
+
+module.exports = {
+  app: app
+};

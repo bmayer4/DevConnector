@@ -53,7 +53,7 @@ class EditProfile extends Component {
         social: { twitter = '', facebook = '', instagram = '', youtube = '', linkedin = '' } = {}
       } = profile;
 
-        const skillsCSV = profile.skills.join(',');
+        const skillsCSV = profile.skills && profile.skills.join(',');
 
 
         this.setState({

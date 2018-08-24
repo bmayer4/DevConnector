@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
+import Spinner from '../components/common/TextFieldGroup';
 
 import { shallow } from 'enzyme';
 
 it('renders without crashing', () => {
 
-  shallow(<App />);
+  shallow(<Spinner />);
 
 });

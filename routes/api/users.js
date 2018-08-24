@@ -73,7 +73,7 @@ router.post('/login', (req, res) => {
                     token: 'Bearer ' + token
                 });
                 }
-            }).catch(err => { res.json(err) });
+            }).catch(err => { res.status(401).json(err) });
             }).catch((e) => {
                 errors.password = 'Password incorrect';
                 res.status(401).json(errors); 

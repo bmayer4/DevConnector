@@ -46,5 +46,6 @@ img {
  min-height: 100vh;
 }
 .App .container {
- flex: 1 0 auto;
+ /*flex: 1 0 auto;*/
+ flex: 1;
 }
