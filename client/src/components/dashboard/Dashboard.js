@@ -44,7 +44,7 @@ class Dashboard extends Component {
           <Experience experience={profile.experience} expDeleteClick={this.onExpDeleteClick}/>
           <Education education={profile.education} eduDeleteClick={this.onEduDeleteClick} />
           <div style={{  marginBottom: '60px' }} />
-          <button className="btn btn-sm btn-danger" onClick={this.onDeleteClick}>DELETE ACCOUNT</button>
+          <button className="btn btn-sm btn-danger" onClick={this.onDeleteClick}>DELETE PROFILE</button>
           </div>
         )
         } else {

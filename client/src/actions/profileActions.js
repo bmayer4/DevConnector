@@ -73,11 +73,10 @@ export const startGetProfiles = () => dispatch => {
 }
 
 
-
 export const deleteAccount = () => dispatch => {
-    if (window.confirm('Are you sure you want to delete your account?')) {
+    if (window.confirm('Are you sure you want to delete your Profile?')) {
         axios.delete('/api/profile').then(res => {
-            dispatch(setCurrentUser({}));
+            dispatch(getCurrentProfile({}));
         }).catch(err => {
             dispatch(getErrors(err.response.data)); 
         })

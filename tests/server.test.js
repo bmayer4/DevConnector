@@ -4,7 +4,7 @@ const {ObjectID} = require('mongodb');
 
 const { app } = require('../server');
 const User = require('../models/User');
-const { users, populateUsers } = require('../tests/seed/seed');
+const { users, populateUsers, tokenUser1, tokenUser2 } = require('../tests/seed/seed');
 
 beforeEach(populateUsers);
 
@@ -65,6 +65,7 @@ describe('POST api/users/login', () => {
         .send({email: users[1].email, password: users[1].password})
         .expect(200)
         .expect((res) => {
+            // console.log(tokenUser1)  //we got it!
             expect(res.body.success).toBeTruthy();
             expect(res.body.token).toBeTruthy();
         })
@@ -72,5 +73,3 @@ describe('POST api/users/login', () => {
     });
 
 });
-
-
